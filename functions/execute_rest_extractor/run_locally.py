@@ -3,7 +3,6 @@ from __future__ import annotations
 import os
 
 from dotenv import load_dotenv
-
 from execute_rest_extractor.handler import handle
 
 

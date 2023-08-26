@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from dotenv import load_dotenv
-
 from common.oauth import get_client
+from dotenv import load_dotenv
 from oee_timeseries.handler import handle
 
 if __name__ == "__main__":

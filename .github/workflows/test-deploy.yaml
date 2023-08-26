@@ -1,0 +1,38 @@
+---
+name: Deploy Functions to CDF project using OIDC
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/deploy-functions.yaml
+      - functions/**
+
+jobs:
+  one:
+    name: Explorer
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Dump GitHub context
+        env:
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+
+  deploy:
+    name: Deploy to Cognite Functions
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        function:
+          - execute_rest_extractor
+          - oee_timeseries
+        deploy-all-functions:
+          - common
+        environment:
+          - test
+          - prod
+
+    environment: ${{ matrix.environment }}
+
+    steps:
+      - uses: actions/checkout@v3
