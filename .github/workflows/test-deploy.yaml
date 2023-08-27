@@ -32,7 +32,6 @@ jobs:
           - test
           - prod
 
-    environment: ${{ matrix.environment }}
-
     steps:
-      - uses: actions/checkout@v3
+      - name: Print actions stuff
+      - run: echo ${{ matrix.environment }} ${{ matrix.function }} ${{ matrix.deploy-all-functions }}

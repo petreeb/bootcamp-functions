@@ -22,10 +22,10 @@ jobs:
           - test
           - prod
 
-    # environment: ${{ matrix.environment }}
+    environment: ${{ matrix.environment }}
 
-    # steps:
-    #   - uses: actions/checkout@v3.1.0
+    steps:
+      - uses: actions/checkout@v3.1.0
 
     #   - name: Install yq
     #     run: |
