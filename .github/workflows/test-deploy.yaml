@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - .github/workflows/deploy-functions.yaml
+      - .github/workflows/test-deploy.yaml
       - functions/**
 
 jobs:
