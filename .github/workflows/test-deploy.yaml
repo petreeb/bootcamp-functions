@@ -12,11 +12,12 @@ jobs:
     name: Explorer
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Directory Dump
+        run: git diff --name-only ${{ github.event.after }} ${{ github.event.before }}
 
   deploy:
     name: Deploy to Cognite Functions
@@ -35,9 +36,3 @@ jobs:
     steps:
       - name: Print actions stuff
         run: echo ${{ matrix.environment }} ${{ matrix.function }} ${{ matrix.deploy-all-functions }}
-      - name: Print differently
-        env:
-          ENVIRO: ${{ matrix.environment }}
-          FUNC: ${{ matrix.function }}
-          DEPLOY_ALL: ${{ matrix.deploy-all-functions }}
-        run: echo "$ENVIRO" "$FUNC" "$DEPLOY_ALL"
