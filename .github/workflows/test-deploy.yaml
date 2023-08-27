@@ -21,7 +21,9 @@ jobs:
       - name: Directory Dump
         id: dump
         run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-
+      - name: idk
+        id: idk
+        run: echo "idk=123" >> $GITHUB_OUTPUT
 
   deploy:
     name: Deploy to Cognite Functions
@@ -41,4 +43,4 @@ jobs:
     steps:
       - name: Print actions stuff
         # if: ${{ contains(needs.checkouts.outputs.matrix.files_list, 'execute_rest_extractor') }}
-        run: echo ${{ needs.checkouts.outputs.matrix.files_list }}
+        run: echo ${{ needs.checkouts.outputs.matrix.idk }}
