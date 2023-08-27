@@ -12,7 +12,8 @@ jobs:
     name: Explorer
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.dump.outputs.matrix }}
+      files_list: ${{ steps.dump.outputs.files_list }}
+      idk: ${{ steps.dump.outputs.idk }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -41,6 +42,9 @@ jobs:
           - prod
 
     steps:
-      - name: Print actions stuff
+      # - name: Print actions stuff
         # if: ${{ contains(needs.checkouts.outputs.matrix.files_list, 'execute_rest_extractor') }}
+      - name: print idk
         run: echo ${{ needs.checkouts.outputs.matrix.idk }}
+      - name: print files_list
+        run: echo ${{ needs.checkouts.outputs.matrix.files_list }}
