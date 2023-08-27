@@ -27,7 +27,7 @@ jobs:
       matrix:
         function:
           - execute_rest_extractor
-            if: ${{ contains(needs.checkout.outputs.matrix.files_list, execute_rest_extractor) }}
+            if: ${{ contains(needs.checkout.outputs.matrix.files_list, 'execute_rest_extractor') }}
           - oee_timeseries
         deploy-all-functions:
           - common
