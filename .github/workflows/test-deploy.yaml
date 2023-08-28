@@ -36,8 +36,8 @@ jobs:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
     needs: checkouts
-    strategy:
-      matrix: ${{ fromJSON(needs.checkouts.outputs.matrix) }}
+    # strategy:
+    #   matrix: ${{ fromJSON(needs.checkouts.outputs.matrix) }}
         # function:
         #   - execute_rest_extractor
         #   - oee_timeseries
