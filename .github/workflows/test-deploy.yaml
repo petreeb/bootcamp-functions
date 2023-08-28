@@ -35,6 +35,7 @@ jobs:
         #   - oee_timeseries
         deploy-all-functions:
           - common
+          # - .github/workflows/test-deploy.yaml
         # environment:
         #   - test
         #   - prod
