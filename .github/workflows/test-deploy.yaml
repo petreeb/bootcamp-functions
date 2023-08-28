@@ -11,9 +11,10 @@ jobs:
   checkouts:
     name: Explorer
     runs-on: ubuntu-latest
-    outputs:
-      files_list: ${{ steps.dump.outputs.files_list }}
-      idk: ${{ steps.idk.outputs.idk }}
+    outputs: ${{ fromJSON(steps.dump.outputs.matrix) }}
+      # files_list: ${{ steps.dump.outputs.files_list }}
+      # idk: ${{ steps.idk.outputs.idk }}
+      # idk2: ${{ steps.idk2.outputs }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -22,12 +23,12 @@ jobs:
       - name: Directory Dump
         id: dump
         run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-      - name: idk
-        id: idk
-        run: echo "idk=123" >> $GITHUB_OUTPUT
-      - name: idk2
-        id: idk2
-        run: git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs
+      # - name: idk
+      #   id: idk
+      #   run: echo "idk=123" >> $GITHUB_OUTPUT
+      # - name: idk2
+      #   id: idk2
+      #   run: git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs
 
   deploy:
     name: Deploy to Cognite Functions
