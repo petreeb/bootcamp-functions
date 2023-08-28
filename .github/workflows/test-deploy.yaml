@@ -21,7 +21,10 @@ jobs:
           fetch-depth: 2
       - name: Directory Dump
         id: dump
-        run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT 2>&1
+        run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+      - name: Sanity Check
+        id: insane
+        run: echo "$GITHUB_OUTPUT"
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
@@ -40,4 +43,4 @@ jobs:
       # - name: Deploy all
       #   # if: contains(fromJSON(needs.checkouts.outputs.matrix), fromJSON(matrix.deploy-all-functions))
       - name: print files_list
-        run: echo "${{ fromJSON(needs.dump.outputs.matrix) }}" 2>&1
+        run: echo "${{ fromJSON(needs.dump.outputs.matrix) }}"
