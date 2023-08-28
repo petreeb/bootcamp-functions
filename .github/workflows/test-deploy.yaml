@@ -24,7 +24,7 @@ jobs:
         run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
       - name: Sanity Check
         id: insane
-        run: echo "$GITHUB_OUTPUT" "$files_list"
+        run: echo git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
