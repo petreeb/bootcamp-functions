@@ -21,7 +21,7 @@ jobs:
           fetch-depth: 2
       - name: Directory Dump
         id: dump
-        run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+        run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT 2>&1
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
