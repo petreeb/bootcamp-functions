@@ -40,4 +40,4 @@ jobs:
       # - name: Deploy all
       #   # if: contains(fromJSON(needs.checkouts.outputs.matrix), fromJSON(matrix.deploy-all-functions))
       - name: print files_list
-        run: echo "${{ fromJSON(needs.dump.outputs.matrix) }}"
+        run: echo "${{ fromJSON(needs.dump.outputs.matrix) }}" 2>&1
