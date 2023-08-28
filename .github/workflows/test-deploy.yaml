@@ -25,6 +25,9 @@ jobs:
       - name: idk
         id: idk
         run: echo "idk=123" >> $GITHUB_OUTPUT
+      - name: idk2
+        id: idk2
+        run: git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs
 
   deploy:
     name: Deploy to Cognite Functions
