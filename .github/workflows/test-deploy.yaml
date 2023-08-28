@@ -45,4 +45,4 @@ jobs:
       - name: print files_list
         run: echo "${{ needs.checkouts.outputs.files_list }}"
       - name: print files_list differently
-        run: echo "${{ jobs.checkouts.outputs.files_list }}"
+        run: echo "${{ steps.checkouts.outputs.files_list }}"
