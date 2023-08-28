@@ -38,5 +38,5 @@ jobs:
           - prod
     steps:
       - name: Deploy all
-        if: contains(${{ fromJSON(needs.checkouts.outputs.matrix) }}, ${{ matrix.deploy-all-functions }})
+        if: contains(fromJSON(needs.checkouts.outputs.matrix), matrix.deploy-all-functions)
         run: echo "Deploy All Functions because ${{ matrix.deploy-all-functions }} in ${{ fromJSON(needs.checkouts.outputs.matrix) }}"
