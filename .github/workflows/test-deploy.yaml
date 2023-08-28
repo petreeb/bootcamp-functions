@@ -11,12 +11,14 @@ jobs:
   checkouts:
     name: Explorer
     runs-on: ubuntu-latest
-    outputs: ${{ fromJSON(steps.dump.outputs.matrix) }}
+    outputs: 
+      matrix: ${{ steps.dump.outputs.matrix }}
       # files_list: ${{ steps.dump.outputs.files_list }}
       # idk: ${{ steps.idk.outputs.idk }}
       # idk2: ${{ steps.idk2.outputs }}
     steps:
       - name: Checkout
+        id: checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
@@ -35,20 +37,20 @@ jobs:
     runs-on: ubuntu-latest
     needs: checkouts
     strategy:
-      matrix:
-        function:
-          - execute_rest_extractor
-          - oee_timeseries
-        deploy-all-functions:
-          - common
-        environment:
-          - test
-          - prod
+      matrix: ${{ fromJSON(needs.checkouts.outputs.matrix) }}
+        # function:
+        #   - execute_rest_extractor
+        #   - oee_timeseries
+        # deploy-all-functions:
+        #   - common
+        # environment:
+        #   - test
+        #   - prod
 
     steps:
       # - name: Print actions stuff
         # if: ${{ contains(needs.checkouts.outputs.matrix.files_list, 'execute_rest_extractor') }}
-      - name: print idk
-        run: echo ${{ needs.checkouts.outputs.matrix.idk }}
+      # - name: print idk
+      #   run: echo ${{ needs.checkouts.outputs.matrix.idk }}
       - name: print files_list
-        run: echo ${{ needs.checkouts.outputs.matrix.files_list }}
+        run: echo ${{ fromJSON(needs.checkouts.outputs.matrix) }}
