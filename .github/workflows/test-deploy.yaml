@@ -12,7 +12,7 @@ jobs:
     name: Strategy Builder
     runs-on: ubuntu-latest
     outputs:
-        files_list: ${{ steps.dump.outputs.files_list }}
+        files_list: ${{ steps.checkout.outputs.files_list }}
       # matrix: ${{ steps.dump.outputs.matrix }}
     steps:
       - name: Checkout
@@ -20,8 +20,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      - name: Directory Dump
-        id: dump
         run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
       - name: Sanity Check
         run: git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs
