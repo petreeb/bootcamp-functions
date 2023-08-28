@@ -6,9 +6,15 @@ on:
     paths:
       - .github/workflows/test-deploy.yaml
       - functions/**
+    inputs:
+      functions:
+        required: true
+          default: 
+            - execute_rest_extractor
+            - oee_timeseries
 
 jobs:
-  checkouts:
+  strategy-builder:
     name: Strategy Builder
     runs-on: ubuntu-latest
     outputs:
@@ -23,15 +29,17 @@ jobs:
         id: dump
         run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
       - name: Deploy All Check
-        run: echo "DEPLOY_ALL=git diff --name-only -- .github common | xargs"
-      - run: echo $DEPLOY_ALL
+        run: echo "DEPLOY_ALL=$(git diff --name-only -- .github common | xargs)"
+      - name: test deploy all
+        if: echo $DEPLOY_ALL
+        run: echo "YES DEPLOY ALL"
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
-    needs: checkouts
+    needs: strategy-builder
     strategy:
       matrix:
-        # function:
+        # functions:
         #   - execute_rest_extractor
         #   - oee_timeseries
         deploy-all-functions:
@@ -42,7 +50,7 @@ jobs:
         #   - prod
     steps:
       - name: print files_list
-        run: echo "${{ needs.checkouts.outputs.files_list }}"
+        run: echo "${{ needs.strategy-builder.outputs.files_list }}"
       - name: Deploy all
-        if: contains(needs.checkouts.outputs.files_list, matrix.deploy-all-functions)
+        if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
