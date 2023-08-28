@@ -28,15 +28,15 @@ jobs:
     needs: checkouts
     strategy:
       matrix:
-        function:
-          - execute_rest_extractor
-          - oee_timeseries
+        # function:
+        #   - execute_rest_extractor
+        #   - oee_timeseries
         deploy-all-functions:
           - common
-        environment:
-          - test
-          - prod
+        # environment:
+        #   - test
+        #   - prod
     steps:
       - name: Deploy all
         if: contains(fromJSON(needs.checkouts.outputs.matrix), fromJSON(matrix.deploy-all-functions))
-        run: echo "Deploy All Functions because ${{ matrix.deploy-all-functions }} in ${{ fromJSON(needs.checkouts.outputs.matrix) }}"
+        run: echo "Deploy All Functions because ${{ matrix.deploy-all-functions }} in ${{ needs.checkouts.outputs.matrix }}"
