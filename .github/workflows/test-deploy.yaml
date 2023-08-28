@@ -40,9 +40,8 @@ jobs:
         #   - test
         #   - prod
     steps:
-      # - name: Deploy all
-      #   # if: contains(fromJSON(needs.checkouts.outputs.matrix), fromJSON(matrix.deploy-all-functions))
       - name: print files_list
         run: echo "${{ needs.checkouts.outputs.files_list }}"
-      - name: print files_list differently
-        run: echo "${{ steps.checkouts.outputs.files_list }}"
+      - name: Deploy all
+        if: contains(needs.checkouts.outputs.files_list, matrix.deploy-all-functions)
+        run: echo "Contains ${{ matrix.deploy-all-functions }}"
