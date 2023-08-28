@@ -34,8 +34,8 @@ jobs:
         #   - execute_rest_extractor
         #   - oee_timeseries
         deploy-all-functions:
-          - common
-          # - .github/workflows/test-deploy.yaml
+          # - common
+          - .github/workflows/test-deploy.yaml
         # environment:
         #   - test
         #   - prod
