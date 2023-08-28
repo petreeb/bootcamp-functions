@@ -12,7 +12,8 @@ jobs:
     name: Strategy Builder
     runs-on: ubuntu-latest
     outputs:
-      files_list: ${{ steps.checkout.outputs.files_list }}
+      matrix:
+        files_list: ${{ steps.dump.outputs.files_list }}
       # matrix: ${{ steps.dump.outputs.matrix }}
     steps:
       - name: Checkout
@@ -44,4 +45,4 @@ jobs:
       # - name: Deploy all
       #   # if: contains(fromJSON(needs.checkouts.outputs.matrix), fromJSON(matrix.deploy-all-functions))
       - name: print files_list
-        run: echo "${{ needs.checkouts.outputs.files_list }}"
+        run: echo "${{ needs.checkouts.outputs.matrix.files_list }}"
