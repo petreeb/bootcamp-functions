@@ -39,4 +39,4 @@ jobs:
     steps:
       - name: Deploy all
         # if: contains(fromJSON(needs.checkouts.outputs.matrix), fromJSON(matrix.deploy-all-functions))
-        run: echo "${{ fromJSON(needs.checkouts.outputs.matrix) }}"
+        run: echo "${{ needs.checkouts.outputs.matrix }}"
