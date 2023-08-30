@@ -10,7 +10,6 @@ on:
       functions:
         required: true
           default: "['execute_rest_extractor','oee_timeseries']"
-          
 
 jobs:
   strategy-builder:
