@@ -38,7 +38,7 @@ jobs:
         #   - execute_rest_extractor
         #   - oee_timeseries
         deploy-all-functions:
-          - common
+          # - common
           - .github/workflows/test-deploy.yaml
         # environment:
         #   - test
@@ -49,3 +49,5 @@ jobs:
       - name: Deploy all
         if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
+      - name: Print inputs
+        run: echo ${{ inputs.functions }}
