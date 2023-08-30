@@ -28,9 +28,6 @@ jobs:
         run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
       - name: Deploy All Check
         run: echo "DEPLOY_ALL=$(git diff --name-only -- .github common | xargs)"
-      - name: test deploy all
-        if: echo $DEPLOY_ALL
-        run: echo "YES DEPLOY ALL"
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
