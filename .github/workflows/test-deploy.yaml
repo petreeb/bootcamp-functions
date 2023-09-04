@@ -8,7 +8,7 @@ on:
       - functions/**
     inputs:
       functions:
-        required: true
+        required: false
         default: "['execute_rest_extractor','oee_timeseries']"
 
 jobs:
@@ -50,4 +50,4 @@ jobs:
         if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
       - name: Print inputs
-        run: echo "${{ toJSON(github.event.inputs.functions) }}"
+        run: echo "${{ toJSON(github.event.inputs) }}"
