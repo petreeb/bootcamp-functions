@@ -2,7 +2,7 @@
 name: Deploy Functions to CDF project using OIDC
 on:
   push:
-    branches: [main]
+    branches: [idk]
     paths:
       - .github/workflows/test-deploy.yaml
       - functions/**
