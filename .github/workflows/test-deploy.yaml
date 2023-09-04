@@ -50,4 +50,4 @@ jobs:
         if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
       - name: Print inputs
-        run: echo "${{ inputs.matrix }}"
+        run: echo "${{ github.event.inputs.matrix }}"
