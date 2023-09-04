@@ -25,14 +25,14 @@ jobs:
       - name: Deploy All Check
         run: echo "DEPLOY_ALL=$(git diff --name-only -- .github common | xargs)"
       - name: Print Directories
-        run: ls -d functions/*/
+        run: echo "foo=$(find . -type f -printf '"%f"')"
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
     needs: strategy-builder
     strategy:
       matrix:
-        # functions:
+        # function:
         #   - execute_rest_extractor
         #   - oee_timeseries
         deploy-all-functions:
