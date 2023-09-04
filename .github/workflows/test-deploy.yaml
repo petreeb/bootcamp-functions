@@ -25,7 +25,7 @@ jobs:
       - name: Deploy All Check
         run: echo "DEPLOY_ALL=$(git diff --name-only -- .github common | xargs)"
       - name: Print Directories
-        run: echo "foo=$(find . -type f -printf '"%f"')"
+        run: echo "foo=$(find functions/ -maxdepth 0 -type d -printf '"%f"')"
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
