@@ -25,7 +25,7 @@ jobs:
       - name: Deploy All Check
         run: echo "DEPLOY_ALL=$(git diff --name-only -- .github common | xargs)"
       - name: Print Directories
-        run: ls -d ./*
+        run: ls -d */
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
