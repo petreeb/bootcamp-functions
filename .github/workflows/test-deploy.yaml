@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
         files_list: ${{ steps.dump.outputs.files_list }}
-        matrix: ${{ steps.get-matrix.matrix }}
+        strategy-matrix: ${{ steps.get-matrix.outputs.matrix }}
     steps:
       - name: Checkout
         id: checkout
@@ -26,10 +26,10 @@ jobs:
       - name: Deploy All Check
         run: echo "DEPLOY_ALL=$(git diff --name-only -- .github common | xargs)"
       - name: Print Directories
-        run: echo "foo=[$(find functions/* -maxdepth 0 -type d -printf '"%f",')]"
+        run: echo "FOO=[$(find functions/* -maxdepth 0 -type d -printf '"%f",')]"
       - name: Print Matrix
         id: get-matrix
-        run: echo "matrix=$(jq -cr '@json' <<< "$foo")"
+        run: echo "MATRIX=$(jq -cr '@json' <<< "$FOO")" >> $GITHUB_OUTPUT
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
@@ -52,4 +52,4 @@ jobs:
         if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
       - name: Print matrix input
-        run: echo "${{ fromJson(needs.strategy-builder.outputs.matrix) }}"
+        run: echo "${{ fromJson(needs.strategy-builder.outputs.strategy-matrix) }}"
