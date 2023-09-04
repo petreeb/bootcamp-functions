@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
         files_list: ${{ steps.dump.outputs.files_list }}
-        strategy-matrix: ${{ steps.get-matrix.outputs.matrix }}
+        strategy-matrix: ${{ steps.get-matrix.outputs.MATRIX }}
     steps:
       - name: Checkout
         id: checkout
