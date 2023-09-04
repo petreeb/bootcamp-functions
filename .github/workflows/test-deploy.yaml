@@ -52,4 +52,4 @@ jobs:
         if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
       - name: Print matrix input
-        run: echo "${{ needs.strategy-builder.outputs.matrix }}"
+        run: echo "${{ fromJson(needs.strategy-builder.outputs.matrix) }}"
