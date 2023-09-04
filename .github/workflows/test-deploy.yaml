@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
         files_list: ${{ steps.dump.outputs.files_list }}
+        matrix: ${{ steps.get-matrix.matrix }}
     steps:
       - name: Checkout
         id: checkout
@@ -27,6 +28,7 @@ jobs:
       - name: Print Directories
         run: echo "foo=[$(find functions/* -maxdepth 0 -type d -printf '"%f",')]"
       - name: Print Matrix
+        id: get-matrix
         run: echo "matrix=$(jq -cr '@json' <<< "$foo")"
   deploy:
     name: Deploy to Cognite Functions
@@ -49,3 +51,5 @@ jobs:
       - name: Deploy all
         if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
+      - name: Print matrix input
+        run: echo "${{ needs.strategy-builder.outputs.matrix }}"
