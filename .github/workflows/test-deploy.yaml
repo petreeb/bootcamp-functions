@@ -23,9 +23,9 @@ jobs:
 
       - name: Directory Dump
         id: dump
-        run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
+        run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)"
       - name: Deploy All Check
-        run: echo "DEPLOY_ALL=$(git diff --name-only -- .github/workflows/test-deploy.yaml functions/common | xargs)"
+        run: echo "DEPLOY_ALL=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)"
       - name: Print All Functions
         run: find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} \;| jq -Rs 'split("\n")[:-1]'
       - name: Print Matrix
