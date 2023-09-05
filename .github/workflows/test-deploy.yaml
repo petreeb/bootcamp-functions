@@ -23,10 +23,10 @@ jobs:
       - name: Deploy All Check
         run: echo "DEPLOY_ALL=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)"
       - name: Print All Functions
-        run: echo "ALL_FUNCTIONS=$(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} ';')" >> $GITHUB_OUTPUT
-      - name: Print envvar
-        run: echo "$ALL_FUNCTIONS"
-      - name: Only Matrix
+        run: echo "ALL_FUNCTIONS=$(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} ';')"
+      # - name: Print envvar
+      #   run: echo "$ALL_FUNCTIONS"
+      # - name: Only Matrix
         run: "echo \"MATRIX=$(jq -n --arg inarr \"${ALL_FUNCTIONS}\" '{ function: $inarr | split(\"\\n\") }')\""
       # - name: Build Strategy Matrix
       #   run: "test -n \"$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)\" || echo \"Do NOT Deploy all\" && echo MATRIX=\"{\"function\": $(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} \;| jq -Rs 'split(\"\n\")[:-1]')}\""
