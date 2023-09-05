@@ -27,7 +27,7 @@ jobs:
       # - name: Print envvar
       #   run: echo "$ALL_FUNCTIONS"
       # - name: Only Matrix
-        run: "echo \"MATRIX=$(jq -n --arg inarr \"${ALL_FUNCTIONS}\" '{ function: $inarr | split(\"\\n\") }')\""
+             "echo \"MATRIX=$(jq -n --arg inarr \"${ALL_FUNCTIONS}\" '{ function: $inarr | split(\"\\n\") }')\""
       # - name: Build Strategy Matrix
       #   run: "test -n \"$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)\" || echo \"Do NOT Deploy all\" && echo MATRIX=\"{\"function\": $(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} \;| jq -Rs 'split(\"\n\")[:-1]')}\""
   deploy:
