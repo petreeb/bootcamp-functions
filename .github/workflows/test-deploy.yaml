@@ -28,7 +28,7 @@ jobs:
       - name: Print All Functions
         run: find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} \;| jq -Rs 'split("\n")[:-1]'
       - name: Build Strategy Matrix
-        run: "test -n \"$(git diff --name-only ${{ github.event.before }} ${{ github.event.after } -- .github/workflows/test-deploy.yaml functions/common | xargs)\" || echo MATRIX=\"{\"function\": $(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} | jq -Rs 'split(\"\n\")[:-1]')}\" >> $GITHUB_OUTPUT"
+        run: "test -n \"$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)\" || echo MATRIX=\"{\"function\": $(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} | jq -Rs 'split(\"\n\")[:-1]')}\" >> $GITHUB_OUTPUT"
   deploy:
 
     name: Deploy to Cognite Functions
