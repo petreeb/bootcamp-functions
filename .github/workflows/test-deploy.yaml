@@ -56,6 +56,6 @@ jobs:
       - name: Print matrix input
         run: echo "${{ needs.strategy-builder.outputs.strategy-matrix }}"
       - name: print job matrix
-        run: echo "${{ matrix.function }}""
+        run: echo "${{ matrix.function }}"
       - name: print idk
         run: echo "${{ fromJson(needs.strategy-builder.outputs.strategy-matrix) }}"
