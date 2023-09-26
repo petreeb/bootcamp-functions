@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: strategy-builder
     strategy:
-      matrix: fromJson(needs.strategy-builder.outputs.strategy-matrix)
+      matrix: {fromJson(needs.strategy-builder.outputs.strategy-matrix)}
         # function:
         #   - execute_rest_extractor
         #   - oee_timeseries
