@@ -36,22 +36,21 @@ jobs:
     runs-on: ubuntu-latest
     needs: strategy-builder
     strategy:
-      matrix: 
-        ${{fromJson(needs.strategy-builder.outputs.strategy-matrix)}}
+      matrix: ${{fromJson(needs.strategy-builder.outputs.strategy-matrix)}}
         # function:
         #   - execute_rest_extractor
         #   - oee_timeseries
         # deploy-all-functions:
         #   - common
         #   - .github/workflows/test-deploy.yaml
-        environment:
-          - test
-          - prod
+        # environment:
+        #   - test
+        #   - prod
     steps:
       - name: print files_list
         run: echo "${{ needs.strategy-builder.outputs.files_list }}"
       - name: Deploy all
         if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
-      - name: print job matrix
-        run: echo "${{ matrix.function }}"
+      - name: print idk
+        run: echo "${{ var }}"
