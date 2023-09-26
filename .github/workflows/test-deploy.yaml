@@ -24,8 +24,6 @@ jobs:
         run: echo "DEPLOY_ALL=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)"
       # - name: Print All Functions
       #   run: echo "ALL_FUNCTIONS=$(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} ';')" >> $GITHUB_OUTPUT
-      # - name: Print envvar
-      #   run: echo "$ALL_FUNCTIONS"
       - name: Only Matrix
         id: get-matrix
         run: |
@@ -35,18 +33,17 @@ jobs:
       # - name: Build Strategy Matrix
       #   run: "test -n \"$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)\" || echo \"Do NOT Deploy all\" && echo MATRIX=\"{\"function\": $(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} \;| jq -Rs 'split(\"\n\")[:-1]')}\""
   deploy:
-
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
     needs: strategy-builder
     strategy:
-      matrix:
+      matrix: {{ fromJson(needs.strategy-builder.outputs.strategy-matrix) }}
         # function:
         #   - execute_rest_extractor
         #   - oee_timeseries
-        deploy-all-functions:
-          # - common
-          - .github/workflows/test-deploy.yaml
+        # deploy-all-functions:
+        #   - common
+        #   - .github/workflows/test-deploy.yaml
         # environment:
         #   - test
         #   - prod
@@ -58,3 +55,5 @@ jobs:
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
       - name: Print matrix input
         run: echo "${{ needs.strategy-builder.outputs.strategy-matrix }}"
+      - name: print job matrix
+        run: ech ${{ matrix.function }}
