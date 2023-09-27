@@ -37,7 +37,7 @@ jobs:
     needs: strategy-builder
     strategy:
       matrix: 
-        function: ${{fromJson(needs.strategy-builder.outputs.strategy-matrix)}}
+        function: ${{ needs.strategy-builder.outputs.strategy-matrix }}
         environment:
           - test
           - prod
