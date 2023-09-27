@@ -47,4 +47,4 @@ jobs:
         if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
         run: echo "Contains ${{ matrix.deploy-all-functions }}"
       - name: print idk
-        run: echo "${{ toJson(var) }}"
+        run: echo "${{ toJson(vars) }}"
