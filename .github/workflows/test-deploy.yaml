@@ -51,4 +51,4 @@ jobs:
         #   - prod
     steps:
       - name: print files_list
-        run: echo "${{ fromJson(needs.strategy-builder.outputs.function_list) }}"
+        run: echo '${{ fromJson(needs.strategy-builder.outputs.function_list) }}'
