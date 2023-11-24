@@ -42,7 +42,7 @@ jobs:
       - name: Get Functions List
         env:
           FUNC_LIST: ${{ steps.create-function-list.outputs.FUNCTIONS }}
-        run: echo "I guess its $FUNC_LIST"
+        run: echo "$FUNC_LIST"
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
@@ -60,4 +60,4 @@ jobs:
         #   - prod
     steps:
       - name: print files_list
-        run: echo '${{ fromJson(needs.strategy-builder.outputs.functions) }}'
+        run: echo '${{ needs.strategy-builder.outputs.functions }}'
