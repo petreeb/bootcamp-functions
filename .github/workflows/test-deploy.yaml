@@ -50,6 +50,9 @@ jobs:
     strategy:
       matrix:
         function: ${{ fromJson(needs.strategy-builder.outputs.functions) }}
+        environment:
+          - test
+          - prod
     steps:
       - name: print ${{ matrix.function }}
         run: echo "Doing it"
