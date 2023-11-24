@@ -53,13 +53,11 @@ jobs:
         id: extra_secrets
 
       - name: Install yq
-        if: ${{ contains(needs.generate-matrix.outputs.deploy_folders, matrix.function) }}
         run: |
           sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.27.5/yq_linux_amd64
           sudo chmod +x /usr/local/bin/yq
 
       - name: Extract config file parameters
-        if: ${{ contains(needs.generate-matrix.outputs.deploy_folders, matrix.function) }}
         shell: bash
         run: |
           CONFIG_FILES=(" common/function_config_${{ matrix.environment }}.yaml " \
