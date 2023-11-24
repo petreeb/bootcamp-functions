@@ -16,7 +16,7 @@ jobs:
     name: Strategy Builder
     runs-on: ubuntu-latest
     outputs:
-      functions: $ {{ steps.create_function_list.outputs.FUNCTIONS }}
+      functions: $ {{ steps.create-function-list.outputs.FUNCTIONS }}
         # strategy-matrix: ${{ steps.get-matrix.outputs.MATRIX }}
     steps:
       - name: Checkout
@@ -49,7 +49,7 @@ jobs:
     needs: strategy-builder
     strategy:
       matrix:
-        function: ${{ toJson(needs.strategy-builder.outputs.functions) }}
+        function: ${{ fromJson(needs.strategy-builder.outputs.functions) }}
     steps:
       - name: print ${{ matrix.function }}
         run: echo "Doing it"
