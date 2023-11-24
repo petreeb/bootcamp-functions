@@ -17,26 +17,20 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       functions: ${{ steps.create-function-list.outputs.FUNCTIONS }}
-        # strategy-matrix: ${{ steps.get-matrix.outputs.MATRIX }}
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      # - name: Deploy All Check
-      #   run: echo "DEPLOY_ALL=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)"
-      # - name: Only Matrix
-      #   id: get-matrix
-      #   run: |
-      #     FUNCTIONS=$(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} \;)
-      #     echo MATRIX=$(jq -n --arg inarr "${FUNCTIONS}" '{ function: $inarr | split("\n") }') >> $GITHUB_OUTPUT
       - name: Build Strategy Matrix
         id: create-function-list
         run: |
           {
             echo "FUNCTIONS<<EOF"
-            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)" && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' >> $GITHUB_OUTPUT
+            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)"\
+            && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
+            || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' >> $GITHUB_OUTPUT
             echo EOF
           } >> "$GITHUB_OUTPUT"
       - name: Get Functions List
