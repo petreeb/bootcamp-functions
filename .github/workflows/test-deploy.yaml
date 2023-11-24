@@ -36,7 +36,7 @@ jobs:
         run: |
           {
             echo "FUNCTIONS<<EOF"
-            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)" && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
+            echo "test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)" && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'" >> $GITHUB_OUTPUT
             echo EOF
           } >> "$GITHUB_OUTPUT"
   deploy:
