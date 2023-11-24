@@ -34,11 +34,11 @@ jobs:
       - name: Build Strategy Matrix
         id: create_function_list
         run: |
-        {
-          echo "FUNCTIONS<<EOF
-          test -n "$(git diff --name-only -- .github/workflows/test-deploy.yaml functions/common | xargs)" && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' || git diff --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
-          echo EOF
-        } >> "$GITHUB_OUTPUT"
+          {
+            echo "FUNCTIONS<<EOF
+            test -n "$(git diff --name-only -- .github/workflows/test-deploy.yaml functions/common | xargs)" && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' || git diff --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
