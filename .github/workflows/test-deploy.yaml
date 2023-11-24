@@ -6,54 +6,50 @@ on:
     paths:
       - .github/workflows/test-deploy.yaml
       - functions/**
+    # outputs:
+    #   strat-matrix:
+    #     environment:
+    #       description: List of environments to deploy to.
+    #       value: ${{ ['prod', 'test'] }}
 
 jobs:
   strategy-builder:
     name: Strategy Builder
     runs-on: ubuntu-latest
     outputs:
-        files_list: ${{ steps.dump.outputs.files_list }}
-        strategy-matrix: ${{ steps.get-matrix.outputs.MATRIX }}
+      function_list: $ {{ steps.create_function_list.outputs.functions }}
+        # strategy-matrix: ${{ steps.get-matrix.outputs.MATRIX }}
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      - name: Deploy All Check
-        run: echo "DEPLOY_ALL=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)"
-      # - name: Print All Functions
-      #   run: echo "ALL_FUNCTIONS=$(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} ';')" >> $GITHUB_OUTPUT
-      # - name: Print envvar
-      #   run: echo "$ALL_FUNCTIONS"
-      - name: Only Matrix
-        id: get-matrix
-        run: |
-          FUNCTIONS=$(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} \;)
-          echo MATRIX=$(jq -n --arg inarr "${FUNCTIONS}" '{ function: $inarr | split("\n") }') >> $GITHUB_OUTPUT
-      # - name: Build Strategy Matrix
-      #   run: "test -n \"$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)\" || echo \"Do NOT Deploy all\" && echo MATRIX=\"{\"function\": $(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} \;| jq -Rs 'split(\"\n\")[:-1]')}\""
+      # - name: Deploy All Check
+      #   run: echo "DEPLOY_ALL=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)"
+      # - name: Only Matrix
+      #   id: get-matrix
+      #   run: |
+      #     FUNCTIONS=$(find functions/*/ -path functions/common/ -prune -o -maxdepth 0 -type d -exec basename {} \;)
+      #     echo MATRIX=$(jq -n --arg inarr "${FUNCTIONS}" '{ function: $inarr | split("\n") }') >> $GITHUB_OUTPUT
+      - name: Build Strategy Matrix
+        id: create_function_list
+        run: echo "function_list=$(test -n "$(git diff --name-only -- .github/workflows/test-deploy.yaml functions/common | xargs)" && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' || git diff --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]')" >> $GITHUB_OUTPUT
   deploy:
-
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
     needs: strategy-builder
-    strategy:
-      matrix:
+    # strategy:
+      # matrix:
         # function:
         #   - execute_rest_extractor
         #   - oee_timeseries
-        deploy-all-functions:
+        # deploy-all-functions:
           # - common
-          - .github/workflows/test-deploy.yaml
+          # - .github/workflows/test-deploy.yaml
         # environment:
         #   - test
         #   - prod
     steps:
       - name: print files_list
         run: echo "${{ needs.strategy-builder.outputs.files_list }}"
-      - name: Deploy all
-        if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
-        run: echo "Contains ${{ matrix.deploy-all-functions }}"
-      - name: Print matrix input
-        run: echo "${{ needs.strategy-builder.outputs.strategy-matrix }}"
