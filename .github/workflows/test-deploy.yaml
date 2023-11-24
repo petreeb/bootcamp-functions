@@ -16,7 +16,7 @@ jobs:
     name: Strategy Builder
     runs-on: ubuntu-latest
     outputs:
-      function_list: $ {{ steps.create_function_list.outputs.function_list }}
+      functions: $ {{ steps.create_function_list.outputs.FUNCTIONS }}
         # strategy-matrix: ${{ steps.get-matrix.outputs.MATRIX }}
     steps:
       - name: Checkout
@@ -33,7 +33,12 @@ jobs:
       #     echo MATRIX=$(jq -n --arg inarr "${FUNCTIONS}" '{ function: $inarr | split("\n") }') >> $GITHUB_OUTPUT
       - name: Build Strategy Matrix
         id: create_function_list
-        run: echo "function_list=$(test -n "$(git diff --name-only -- .github/workflows/test-deploy.yaml functions/common | xargs)" && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' || git diff --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]')" >> $GITHUB_OUTPUT
+        run: |
+        {
+          echo "FUNCTIONS<<EOF
+          test -n "$(git diff --name-only -- .github/workflows/test-deploy.yaml functions/common | xargs)" && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' || git diff --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
+          echo EOF
+        } >> "$GITHUB_OUTPUT"
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
@@ -51,4 +56,4 @@ jobs:
         #   - prod
     steps:
       - name: print files_list
-        run: echo '${{ fromJson(needs.strategy-builder.outputs.function_list) }}'
+        run: echo '${{ fromJson(needs.strategy-builder.outputs.functions) }}'
