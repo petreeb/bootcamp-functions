@@ -16,7 +16,7 @@ jobs:
     name: Strategy Builder
     runs-on: ubuntu-latest
     outputs:
-      function_list: $ {{ steps.create_function_list.outputs.functions }}
+      function_list: $ {{ steps.create_function_list.outputs.function_list }}
         # strategy-matrix: ${{ steps.get-matrix.outputs.MATRIX }}
     steps:
       - name: Checkout
