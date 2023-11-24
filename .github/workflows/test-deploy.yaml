@@ -1,10 +1,13 @@
 name: Deploy Functions to CDF project using OIDC
+env:
+  FUNCTION_DIR: functions
+
 on:
   push:
     branches: [idk]
     paths:
       - .github/workflows/test-deploy.yaml
-      - functions/**
+      - ${{ env.FUNCTION_DIR }}/**
 
 jobs:
   strategy-builder:
@@ -23,9 +26,9 @@ jobs:
         run: |
           {
             echo "FUNCTIONS<<EOF"
-            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)"\
-            && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
-            || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
+            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml ${{ env.FUNCTION_DIR }}/common | xargs)"\
+            && find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.FUNCTION_DIR }}/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
+            || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only ${{ env.FUNCTION_DIR }}/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
             echo EOF
           } >> "$GITHUB_OUTPUT"
       - name: Get Functions List
@@ -55,9 +58,9 @@ jobs:
           # Parameters you may likely hardcode here directly:
           runtime: py39
           # Parameters we can read/extract automatically:
-          function_folder: ${{ matrix.function }}
-          function_external_id: ${{ matrix.function }}
-          schedule_file: schedules/${{ matrix.environment }}.yaml
+          function_folder: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
+          function_external_id: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
+          schedule_file: ${{ env.FUNCTION_DIR }}/schedules/${{ matrix.environment }}.yaml
           # Parameters we get from Github secret storage:
           deployment_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
           deployment_client_secret: ${{secrets.DEPLOYMENT_CLIENT_SECRET }}
