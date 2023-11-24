@@ -49,15 +49,7 @@ jobs:
     needs: strategy-builder
     strategy:
       matrix:
-        function: ${{ fromJson(needs.strategy-builder.outputs.functions) }}
-        #   - execute_rest_extractor
-        #   - oee_timeseries
-        # deploy-all-functions:
-          # - common
-          # - .github/workflows/test-deploy.yaml
-        # environment:
-        #   - test
-        #   - prod
+        function: ${{ needs.strategy-builder.outputs.functions }}
     steps:
       - name: print ${{ matrix.function }}
         run: echo "Doing it"
