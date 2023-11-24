@@ -7,7 +7,7 @@ on:
     branches: [idk]
     paths:
       - .github/workflows/test-deploy.yaml
-      - ${{ env.FUNCTION_DIR }}/**
+      - functions/**
 
 jobs:
   strategy-builder:
