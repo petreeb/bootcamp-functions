@@ -49,7 +49,7 @@ jobs:
     needs: strategy-builder
     strategy:
       matrix:
-        function: ${{ needs.strategy-builder.outputs.functions }}
+        function: ${{ toJson(needs.strategy-builder.outputs.functions) }}
     steps:
       - name: print ${{ matrix.function }}
         run: echo "Doing it"
