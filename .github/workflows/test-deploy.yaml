@@ -66,8 +66,8 @@ jobs:
         shell: bash
         run: |
           CONFIG_FILES=("${{ env.FUNCTION_DIR }}/common/function_config_${{ matrix.environment }}.yaml" \
-            "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/function_config.yaml" \
-            "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/function_config_${{ matrix.environment }}.yaml")
+            "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/configs/function_config.yaml" \
+            "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/configs/function_config_${{ matrix.environment }}.yaml")
           echo "Config files to use are ${CONFIG_FILES[@]}"
           for FILE in ${CONFIG_FILES[@]}
           do
