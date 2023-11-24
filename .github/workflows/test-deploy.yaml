@@ -46,6 +46,11 @@ jobs:
           - test
           - prod
     steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
       - name: Extra secrets
         # Secret name should be EXTRA_SECRETS_{function name} (if applicable)
         run: |
