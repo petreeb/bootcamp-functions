@@ -5,11 +5,6 @@ on:
     paths:
       - .github/workflows/test-deploy.yaml
       - functions/**
-    # outputs:
-    #   strat-matrix:
-    #     environment:
-    #       description: List of environments to deploy to.
-    #       value: ${{ ['prod', 'test'] }}
 
 jobs:
   strategy-builder:
@@ -27,7 +22,7 @@ jobs:
         id: create-function-list
         run: |
           {
-            echo "FUNCTIONS<<EOF"
+            echo "FUNCTIONS << EOF"
             test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml functions/common | xargs)"\
             && find functions/*/ -not -path functions/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
             || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only functions/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' >> $GITHUB_OUTPUT
@@ -48,6 +43,37 @@ jobs:
           - test
           - prod
     steps:
-      - name: print ${{ matrix.function }}
-        run: echo "Doing it"
-        # run: echo '${{ needs.strategy-builder.outputs.functions }}'
+      - name: Extra secrets
+        # Secret name should be EXTRA_SECRETS_{function name} (if applicable)
+        run: |
+          echo "extra_secrets_name=EXTRA_SECRETS_${{ matrix.function }}" >> $GITHUB_OUTPUT
+        id: extra_secrets
+
+      - name: Deploy and schedule ${{matrix.function }}
+        if: ${{ contains(needs.generate-matrix.outputs.deploy_folders, matrix.function) }}
+        uses: cognitedata/function-action-oidc@v1
+        with:
+          # Parameters you may likely hardcode here directly:
+          runtime: py39
+          # Parameters we can read/extract automatically:
+          function_folder: ${{ matrix.function }}
+          function_external_id: ${{ matrix.function }}
+          schedule_file: schedules/${{ matrix.environment }}.yaml
+          # Parameters we get from Github secret storage:
+          deployment_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
+          deployment_client_secret: ${{secrets.DEPLOYMENT_CLIENT_SECRET }}
+          schedules_client_id: ${{ secrets.SCHEDULE_CLIENT_ID }}
+          schedules_client_secret: ${{ secrets.SCHEDULE_CLIENT_SECRET }}
+          function_secrets: EXTRA_SECRETS_${{ matrix.function }}
+          cdf_project: ${{ steps.extract_params.outputs.cdf_project }}
+          cdf_cluster: ${{ steps.extract_params.outputs.cdf_cluster }}
+          data_set_id: ${{ steps.extract_params.outputs.data_set_id }}
+          schedules_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
+          deployment_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
+          common_folder: ${{ steps.extract_params.outputs.common_folder }}
+          function_deploy_timeout: ${{ steps.extract_params.outputs.function_deploy_timeout }}
+          post_deploy_cleanup: ${{ steps.extract_params.outputs.post_deploy_cleanup }}
+          description: ${{ steps.extract_params.outputs.description }}
+          owner: ${{ steps.extract_params.outputs.owner }}
+          env_vars: ${{ steps.extract_params.outputs.env_vars }}
+          metadata: ${{ steps.extract_params.outputs.metadata }}
