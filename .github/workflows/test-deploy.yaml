@@ -71,9 +71,8 @@ jobs:
           echo "Config files to use are ${CONFIG_FILES[@]}"
           for FILE in ${CONFIG_FILES[@]}
           do
-            echo $FILE
             if [ ! -f $FILE ]; then
-                echo "Config: $FILE not supplied!"
+                echo "Config: $FILE not found!"
             else
                 ALLKEYS=$(yq -o=tsv "keys" $FILE)
                 for CONFIGURATION in $ALLKEYS
@@ -97,8 +96,8 @@ jobs:
           # Parameters we get from Github secret storage:
           deployment_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
           deployment_client_secret: ${{secrets.DEPLOYMENT_CLIENT_SECRET }}
-          schedules_client_id: ${{ secrets.SCHEDULE_CLIENT_ID }}
-          schedules_client_secret: ${{ secrets.SCHEDULE_CLIENT_SECRET }}
+          schedules_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
+          schedules_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
           function_secrets: EXTRA_SECRETS_${{ matrix.function }}
           cdf_project: ${{ steps.extract_params.outputs.cdf_project }}
           cdf_cluster: ${{ steps.extract_params.outputs.cdf_cluster }}
