@@ -1,53 +1,112 @@
----
 name: Deploy Functions to CDF project using OIDC
+env:
+  FUNCTION_DIR: functions
+
 on:
   push:
-    branches: [main]
+    branches: [idk]
     paths:
       - .github/workflows/test-deploy.yaml
       - functions/**
-    inputs:
-      functions:
-        required: true
-        default: "['execute_rest_extractor','oee_timeseries']"
 
 jobs:
   strategy-builder:
     name: Strategy Builder
     runs-on: ubuntu-latest
     outputs:
-        files_list: ${{ steps.dump.outputs.files_list }}
+      functions: ${{ steps.create-function-list.outputs.FUNCTIONS }}
     steps:
       - name: Checkout
         id: checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      - name: Directory Dump
-        id: dump
-        run: echo "files_list=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | xargs)" >> $GITHUB_OUTPUT
-      - name: Deploy All Check
-        run: echo "DEPLOY_ALL=$(git diff --name-only -- .github common | xargs)"
+      - name: Build Strategy Matrix
+        id: create-function-list
+        run: |
+          {
+            echo "FUNCTIONS<<EOF"
+            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml ${{ env.FUNCTION_DIR }}/common | xargs)"\
+            && find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.FUNCTION_DIR }}/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
+            || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only ${{ env.FUNCTION_DIR }}/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+      - name: Get Functions List
+        env:
+          FUNC_LIST: ${{ steps.create-function-list.outputs.FUNCTIONS }}
+        run: echo "$FUNC_LIST"
   deploy:
     name: Deploy to Cognite Functions
     runs-on: ubuntu-latest
     needs: strategy-builder
     strategy:
       matrix:
-        # functions:
-        #   - execute_rest_extractor
-        #   - oee_timeseries
-        deploy-all-functions:
-          # - common
-          - .github/workflows/test-deploy.yaml
-        # environment:
-        #   - test
-        #   - prod
+        function: ${{ fromJson(needs.strategy-builder.outputs.functions) }}
+        environment:
+          - test
+          - prod
     steps:
-      - name: print files_list
-        run: echo "${{ needs.strategy-builder.outputs.files_list }}"
-      - name: Deploy all
-        if: contains(needs.strategy-builder.outputs.files_list, matrix.deploy-all-functions)
-        run: echo "Contains ${{ matrix.deploy-all-functions }}"
-      - name: Print inputs
-        run: echo "${{ inputs.matrix }}"
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: Extra secrets
+        run: |
+          echo "extra_secrets_name=EXTRA_SECRETS_${{ matrix.function }}" >> $GITHUB_OUTPUT
+        id: extra_secrets
+
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.27.5/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      - name: Extract config file parameters
+        shell: bash
+        run: |
+          CONFIG_FILES=("${{ env.FUNCTION_DIR }}/common/function_config_${{ matrix.environment }}.yaml" \
+            "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/configs/function_config.yaml" \
+            "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/configs/function_config_${{ matrix.environment }}.yaml")
+          echo "Config files to use are ${CONFIG_FILES[@]}"
+          for FILE in ${CONFIG_FILES[@]}
+          do
+            if [ ! -f $FILE ]; then
+                echo "Config: $FILE not found!"
+            else
+                ALLKEYS=$(yq -o=tsv "keys" $FILE)
+                for CONFIGURATION in $ALLKEYS
+                do
+                    VALUE=$(yq -o=json -I=0 ".$CONFIGURATION" $FILE | sed -e 's/^"//' -e 's/"$//')
+                    echo $CONFIGURATION=$VALUE >> $GITHUB_OUTPUT
+                done
+            fi
+          done
+        id: extract_params
+
+      - name: Deploy and schedule ${{matrix.function }}
+        uses: cognitedata/function-action-oidc@v1
+        with:
+          # Parameters you may likely hardcode here directly:
+          runtime: py39
+          # Parameters we can read/extract automatically:
+          function_folder: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
+          function_external_id: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
+          schedule_file: ${{ env.FUNCTION_DIR }}/schedules/${{ matrix.environment }}.yaml
+          # Parameters we get from Github secret storage:
+          deployment_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
+          deployment_client_secret: ${{secrets.DEPLOYMENT_CLIENT_SECRET }}
+          schedules_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
+          schedules_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
+          function_secrets: EXTRA_SECRETS_${{ matrix.function }}
+          cdf_project: ${{ steps.extract_params.outputs.cdf_project }}
+          cdf_cluster: ${{ steps.extract_params.outputs.cdf_cluster }}
+          data_set_id: ${{ steps.extract_params.outputs.data_set_id }}
+          schedules_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
+          deployment_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
+          common_folder: ${{ steps.extract_params.outputs.common_folder }}
+          function_deploy_timeout: ${{ steps.extract_params.outputs.function_deploy_timeout }}
+          post_deploy_cleanup: ${{ steps.extract_params.outputs.post_deploy_cleanup }}
+          description: ${{ steps.extract_params.outputs.description }}
+          owner: ${{ steps.extract_params.outputs.owner }}
+          env_vars: ${{ steps.extract_params.outputs.env_vars }}
+          metadata: ${{ steps.extract_params.outputs.metadata }}

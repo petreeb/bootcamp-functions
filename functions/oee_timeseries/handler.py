@@ -4,10 +4,7 @@ import random
 from concurrent.futures import Future
 from concurrent.futures import ThreadPoolExecutor
 from math import floor
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Tuple
+from typing import Any, Dict, List, Tuple
 
 import arrow
 import numpy as np
