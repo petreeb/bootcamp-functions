@@ -52,7 +52,6 @@ jobs:
         with:
           fetch-depth: 2
       - name: Extra secrets
-        # Secret name should be EXTRA_SECRETS_{function name} (if applicable)
         run: |
           echo "extra_secrets_name=EXTRA_SECRETS_${{ matrix.function }}" >> $GITHUB_OUTPUT
         id: extra_secrets
