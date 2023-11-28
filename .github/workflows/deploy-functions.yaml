@@ -18,9 +18,9 @@ jobs:
           - oee_timeseries
         deploy-all-functions:
           - common
-        environment:
-          - test
-          - prod
+        # environment:
+        #   - test
+        #   - prod
 
     environment: ${{ matrix.environment }}
 
