@@ -87,15 +87,12 @@ jobs:
       - name: Deploy and schedule ${{matrix.function }}
         uses: cognitedata/function-action-oidc@v1
         with:
-          # Parameters you may likely hardcode here directly:
           runtime: py39
-          # Parameters we can read/extract automatically:
           function_folder: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
           function_external_id: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
           schedule_file: ${{ env.FUNCTION_DIR }}/schedules/${{ matrix.environment }}.yaml
-          # Parameters we get from Github secret storage:
           deployment_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
-          deployment_client_secret: ${{secrets.DEPLOYMENT_CLIENT_SECRET }}
+          deployment_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
           schedules_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
           schedules_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
           function_secrets: EXTRA_SECRETS_${{ matrix.function }}
