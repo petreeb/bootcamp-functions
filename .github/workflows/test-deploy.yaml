@@ -52,7 +52,6 @@ jobs:
         with:
           fetch-depth: 2
       - name: Extra secrets
-        # Secret name should be EXTRA_SECRETS_{function name} (if applicable)
         run: |
           echo "extra_secrets_name=EXTRA_SECRETS_${{ matrix.function }}" >> $GITHUB_OUTPUT
         id: extra_secrets
@@ -94,7 +93,7 @@ jobs:
           deployment_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
           deployment_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
           schedules_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
-          schedules_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
+          schedules_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
           function_secrets: EXTRA_SECRETS_${{ matrix.function }}
           cdf_project: ${{ steps.extract_params.outputs.cdf_project }}
           cdf_cluster: ${{ steps.extract_params.outputs.cdf_cluster }}
