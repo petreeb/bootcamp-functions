@@ -81,7 +81,7 @@ jobs:
       
       - name: Replace spaces with underscores
         id: snake_case
-        run: echo "SNAKE_CASE=${${{ matrix.function }}// /_}" >> $GITHUB_ENV
+        run: echo "SNAKE_CASE=${${{ matrix.function }}// /_}" >> $GITHUB_OUTPUT
 
       - name: Deploy and schedule ${{ matrix.function }}
         uses: cognitedata/function-action-oidc@v1
