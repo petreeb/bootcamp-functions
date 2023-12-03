@@ -91,8 +91,8 @@ jobs:
         with:
           runtime: py39
           function_folder: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
-          function_external_id: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
-          schedule_file: ${{ env.FUNCTION_DIR }}/schedules/${{ matrix.environment }}.yaml
+          function_external_id: ${{ matrix.function }}
+          schedule_file: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}/configs/schedule.yaml
           deployment_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
           deployment_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
           schedules_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
