@@ -1,92 +1,109 @@
----
 name: Deploy Functions to CDF project using OIDC
+env:
+  FUNCTION_DIR: functions
+
 on:
   push:
     branches: [main]
     paths:
-      - .github/workflows/deploy-functions.yaml
+      - .github/workflows/test-deploy.yaml
       - functions/**
 
 jobs:
-  deploy:
-    name: Deploy to Cognite Functions
+  strategy-builder:
+    name: Strategy Builder
     runs-on: ubuntu-latest
+    outputs:
+      functions: ${{ steps.create-function-list.outputs.FUNCTIONS }}
+    steps:
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Build Strategy Matrix
+        id: create-function-list
+        run: |
+          {
+            echo "FUNCTIONS<<EOF"
+            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml ${{ env.FUNCTION_DIR }}/common | xargs)"\
+            && find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.FUNCTION_DIR }}/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
+            || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only ${{ env.FUNCTION_DIR }}/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+
+  deploy:
+    name: Deploy Cognite Functions
+    runs-on: ubuntu-latest
+    needs: strategy-builder
     strategy:
       matrix:
-        function:
-          - execute_rest_extractor
-          - oee_timeseries
-        deploy-all-functions:
-          - common
-        # environment:
-        #   - test
-        #   - prod
+        function: ${{ fromJson(needs.strategy-builder.outputs.functions) }}
+        environments:
+          - test
+          - prod
 
-    environment: ${{ matrix.environment }}
-
+    environment: ${{ matrix.environments }}
     steps:
-      - uses: actions/checkout@v3.1.0
+      - name: Checkout
+        id: checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
 
-    #   - name: Install yq
-    #     run: |
-    #       sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.27.5/yq_linux_amd64
-    #       sudo chmod +x /usr/local/bin/yq
+      - name: Install yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v4.27.5/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
 
-    #   - name: Extract config file parameters
-    #     shell: bash
-    #     run: |
-    #       CONFIG_FILES=("functions/common/configs/function_config_${{ matrix.environment }}.yaml " \
-    #         "functions/${{ matrix.function }}/configs/function_config.yaml " \
-    #         "functions/${{ matrix.function }}/configs/function_config_${{ matrix.environment }}.yaml ")
-    #       echo "Config files to use are ${CONFIG_FILES[@]}"
-    #       for FILE in ${CONFIG_FILES[@]}
-    #       do
-    #         echo $FILE
-    #         if [ ! -f $FILE ]; then
-    #             echo "Config: $FILE not supplied!"
-    #         else
-    #             ALLKEYS=$(yq -o=tsv "keys" $FILE)
-    #             for CONFIGURATION in $ALLKEYS
-    #             do
-    #                 VALUE=$(yq -o=json -I=0 ".$CONFIGURATION" $FILE | sed -e 's/^"//' -e 's/"$//')
-    #                 echo $CONFIGURATION=$VALUE >> $GITHUB_OUTPUT
-    #             done
-    #         fi
-    #       done
-    #     id: extract_params
+      - name: Extract config file parameters
+        id: extract_params
+        shell: bash
+        run: |
+          CONFIG_FILES=("${{ env.FUNCTION_DIR }}/common/function_config_${{ matrix.environment }}.yaml" \
+            "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/configs/function_config.yaml" \
+            "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/configs/function_config_${{ matrix.environment }}.yaml")
+          echo "Config files to use are ${CONFIG_FILES[@]}"
+          for FILE in ${CONFIG_FILES[@]}
+          do
+            if [ ! -f $FILE ]; then
+                echo "Config: $FILE not found!"
+            else
+                ALLKEYS=$(yq -o=tsv "keys" $FILE)
+                for CONFIGURATION in $ALLKEYS
+                do
+                    VALUE=$(yq -o=json -I=0 ".$CONFIGURATION" $FILE | sed -e 's/^"//' -e 's/"$//')
+                    echo $CONFIGURATION=$VALUE >> $GITHUB_OUTPUT
+                done
+            fi
+          done
+      
+      - name: Replace spaces with underscores
+        id: snake_case
+        run: echo "SNAKE_CASE=${${{ matrix.function }}// /_}" >> $GITHUB_ENV
 
-    #   - name: Extra secrets
-    #     shell: bash
-    #     # Secret name should be EXTRA_SECRETS_{function name} (if applicable)
-    #     run: |
-    #       echo "extra_secrets_name=EXTRA_SECRETS_${{ matrix.function }}" >> $GITHUB_OUTPUT
-    #     id: extract_secrets
-
-    #   - name: Deploy and schedule ${{ matrix.function }}
-    #     uses: cognitedata/function-action-oidc@v1
-    #     with:
-    #       # Parameters you may likely hardcode here directly:
-    #       runtime: py39
-    #       # Parameters we can read/extract automatically:
-    #       function_folder: functions/${{ matrix.function }}
-    #       function_external_id: ${{ matrix.function }}
-    #       schedule_file: configs/schedule.yaml
-    #       # Parameters we get from Github secret storage:
-    #       deployment_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
-    #       deployment_client_secret: ${{secrets.DEPLOYMENT_CLIENT_SECRET }}
-    #       schedules_client_id: ${{ secrets.SCHEDULE_CLIENT_ID }}
-    #       schedules_client_secret: ${{ secrets.SCHEDULE_CLIENT_SECRET }}
-    #       function_secrets: ${{ secrets[steps.extract_secrets.outputs.extra_secrets_name] }}
-    #       # Individual parameters per function we read from 'common/functions_config_[environment].yaml', 'function_config.yaml' and 'function_config_[environment].yaml:
-    #       cdf_project: ${{ steps.extract_params.outputs.cdf_project }}
-    #       cdf_cluster: ${{ steps.extract_params.outputs.cdf_cluster }}
-    #       data_set_id: ${{ steps.extract_params.outputs.data_set_id }}
-    #       schedules_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
-    #       deployment_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
-    #       common_folder: ${{ steps.extract_params.outputs.common_folder }}
-    #       function_deploy_timeout: ${{ steps.extract_params.outputs.function_deploy_timeout }}
-    #       post_deploy_cleanup: ${{ steps.extract_params.outputs.post_deploy_cleanup }}
-    #       description: ${{ steps.extract_params.outputs.description }}
-    #       owner: ${{ steps.extract_params.outputs.owner }}
-    #       env_vars: ${{ steps.extract_params.outputs.env_vars }}
-    #       metadata: ${{ steps.extract_params.outputs.metadata }}
+      - name: Deploy and schedule ${{ matrix.function }}
+        uses: cognitedata/function-action-oidc@v1
+        with:
+          runtime: py39
+          function_folder: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
+          function_external_id: ${{ matrix.function }}
+          schedule_file: configs/schedule.yaml
+          deployment_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
+          deployment_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
+          schedules_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
+          schedules_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
+          function_secrets: ${{ secrets[join('EXTRA_SECRETS_', steps.snake_case.outputs.SNAKE_CASE)] }}
+          cdf_project: ${{ steps.extract_params.outputs.cdf_project }}
+          cdf_cluster: ${{ steps.extract_params.outputs.cdf_cluster }}
+          data_set_id: ${{ steps.extract_params.outputs.data_set_id }}
+          schedules_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
+          deployment_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
+          common_folder: ${{ env.FUNCTION_DIR }}/common
+          function_deploy_timeout: ${{ steps.extract_params.outputs.function_deploy_timeout }}
+          post_deploy_cleanup: ${{ steps.extract_params.outputs.post_deploy_cleanup }}
+          description: ${{ steps.extract_params.outputs.description }}
+          owner: ${{ steps.extract_params.outputs.owner }}
+          env_vars: ${{ steps.extract_params.outputs.env_vars }}
+          metadata: ${{ steps.extract_params.outputs.metadata }}
