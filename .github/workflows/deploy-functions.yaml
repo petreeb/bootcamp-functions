@@ -40,11 +40,11 @@ jobs:
     strategy:
       matrix:
         function: ${{ fromJson(needs.strategy-builder.outputs.functions) }}
-        environments:
+        environment:
           - test
           - prod
 
-    environment: ${{ matrix.environments }}
+    environment: ${{ matrix.environment }}
     steps:
       - name: Checkout
         id: checkout
