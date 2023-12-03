@@ -86,7 +86,7 @@ jobs:
           echo "SNAKE_CASE=${TEMP// /_}" >> $GITHUB_OUTPUT
 
       - name: Print Snakes
-        run: echo ${{ steps.snake_case.outputs.SNAKE_CASE }}
+        run: echo ${{ secrets[join('EXTRA_SECRETS_', steps.snake_case.outputs.SNAKE_CASE)] }}
       - name: Deploy and schedule ${{ matrix.function }}
         uses: cognitedata/function-action-oidc@v1
         with:
