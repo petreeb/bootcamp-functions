@@ -27,7 +27,7 @@ jobs:
         run: |
           {
             echo "FUNCTIONS<<EOF"
-            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/test-deploy.yaml ${{ env.FUNCTION_DIR }}/common | xargs)"\
+            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/deploy-functions.yaml ${{ env.FUNCTION_DIR }}/common | xargs)"\
             && find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.FUNCTION_DIR }}/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
             || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only ${{ env.FUNCTION_DIR }}/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
             echo EOF
@@ -78,13 +78,11 @@ jobs:
                 done
             fi
           done
-      
+
       - name: Replace spaces with underscores
         id: snake_case
         run: |
           echo "SNAKE_CASE=${${{ matrix.function }}// /_}" >> $GITHUB_OUTPUT
-          echo "$SNAKE_CASE"
-      
 
       - name: Deploy and schedule ${{ matrix.function }}
         uses: cognitedata/function-action-oidc@v1
