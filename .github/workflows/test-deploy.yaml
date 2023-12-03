@@ -97,7 +97,7 @@ jobs:
           deployment_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
           schedules_client_id: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
           schedules_client_secret: ${{ secrets.DEPLOYMENT_CLIENT_SECRET }}
-          function_secrets: EXTRA_SECRETS_${{ matrix.function }}
+          function_secrets: ${{ secrets[EXTRA_SECRETS_${{ matrix.function }}] }}
           cdf_project: ${{ steps.extract_params.outputs.cdf_project }}
           cdf_cluster: ${{ steps.extract_params.outputs.cdf_cluster }}
           data_set_id: ${{ steps.extract_params.outputs.data_set_id }}
