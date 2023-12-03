@@ -46,6 +46,8 @@ jobs:
         environment:
           - test
           - prod
+    environment: ${{ matrix.environment }}
+
     steps:
       - name: Checkout
         id: checkout
@@ -83,12 +85,6 @@ jobs:
             fi
           done
         id: extract_params
-
-      - name: Print secret lol
-        env:
-          SUPER_SECRET: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
-        run: |
-          echo "$SUPER_SECRET"
 
       - name: Deploy and schedule ${{matrix.function }}
         uses: cognitedata/function-action-oidc@v1
