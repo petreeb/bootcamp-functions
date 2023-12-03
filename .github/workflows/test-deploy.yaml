@@ -88,7 +88,7 @@ jobs:
         env:
           SUPER_SECRET: ${{ secrets.DEPLOYMENT_CLIENT_ID }}
         run: |
-          example-command "$SUPER_SECRET"
+          echo "$SUPER_SECRET"
 
       - name: Deploy and schedule ${{matrix.function }}
         uses: cognitedata/function-action-oidc@v1
