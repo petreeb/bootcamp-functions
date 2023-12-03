@@ -47,5 +47,4 @@ frontfill:
   continuous: False
   lookback-min: 60
 
-
 oee_timeseries_dataset_ext_id: src:002:opcua:ds
