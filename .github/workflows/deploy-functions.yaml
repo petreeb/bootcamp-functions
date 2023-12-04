@@ -75,7 +75,7 @@ jobs:
                 do
                     VALUE=$(yq -o=json -I=0 ".$CONFIGURATION" $FILE | sed -e 's/^"//' -e 's/"$//')
                     echo $CONFIGURATION=$VALUE >> $GITHUB_OUTPUT
-                    echo $CONFIGURATION=$VALUE
+                    echo "$CONFIGURATION=$VALUE"
                 done
             fi
           done
@@ -86,6 +86,7 @@ jobs:
           TEMP=${{ matrix.function }}
           echo "SNAKE_CASE=${TEMP// /_}" >> $GITHUB_OUTPUT
 
+      - name: Deploy and schedule ${{ matrix.function }}
         uses: cognitedata/function-action-oidc@update-common
         with:
           runtime: py39
