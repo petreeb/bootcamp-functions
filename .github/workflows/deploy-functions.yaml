@@ -88,7 +88,7 @@ jobs:
       - name: Print Snakes
         run: echo ${{ secrets[join('EXTRA_SECRETS_', steps.snake_case.outputs.SNAKE_CASE)] }}
       - name: Deploy and schedule ${{ matrix.function }}
-        uses: cognitedata/function-action-oidc@v1
+        uses: cognitedata/function-action-oidc@update-common
         with:
           runtime: py39
           function_folder: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
