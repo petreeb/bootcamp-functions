@@ -1,0 +1,20 @@
+name: Testing stuff
+
+on:
+  push:
+    branches: [test]
+    paths:
+      - .github/workflows/test.yaml
+
+jobs:
+  first:
+    name: First Test
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Extract vars from yaml
+        id: extract_vars
+        shell: bash
+        env:
+          FIRST: functions/common/configs/function_config_prod.yaml
+        run: echo "${{ env.FIRST }}"
