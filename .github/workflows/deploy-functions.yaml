@@ -87,7 +87,7 @@ jobs:
           echo "SNAKE_CASE=${TEMP// /_}" >> $GITHUB_OUTPUT
 
       - name: Deploy and schedule ${{ matrix.function }}
-        uses: cognitedata/function-action-oidc@petreeb-patch-1
+        uses: cognitedata/function-action-oidc@allow-nested-common
         with:
           runtime: py39
           function_folder: ${{ env.FUNCTION_DIR }}/${{ matrix.function }}
