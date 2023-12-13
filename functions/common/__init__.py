@@ -1,1 +1,1 @@
-from test import HELLO_WORLD
+from .test import HELLO_WORLD
