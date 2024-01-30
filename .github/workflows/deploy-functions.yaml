@@ -8,7 +8,7 @@ on:
     branches: [main]
     paths:
       - .github/workflows/deploy-functions.yaml
-      - ${{ env.FUNCTION_DIR }}/**
+      - functions/**
 
 jobs:
   strategy-builder:
