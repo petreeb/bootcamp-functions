@@ -1,13 +1,14 @@
 name: Deploy Functions to CDF project using OIDC
 env:
   FUNCTION_DIR: functions
+  COMMON_DIR: functions/common
 
 on:
   push:
     branches: [main]
     paths:
       - .github/workflows/deploy-functions.yaml
-      - functions/**
+      - ${{ env.FUNCTION_DIR }}/**
 
 jobs:
   strategy-builder:
@@ -27,8 +28,8 @@ jobs:
         run: |
           {
             echo "FUNCTIONS<<EOF"
-            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/deploy-functions.yaml ${{ env.FUNCTION_DIR }}/common/ | xargs)"\
-            && find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.FUNCTION_DIR }}/common/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
+            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/deploy-functions.yaml ${{ env.COMMON_DIR }}/ | xargs)"\
+            && find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.COMMON_DIR }}/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
             || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only ${{ env.FUNCTION_DIR }}/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
             echo EOF
           } >> "$GITHUB_OUTPUT"
@@ -61,7 +62,7 @@ jobs:
         id: extract_params
         shell: bash
         run: |
-          CONFIG_FILES=("${{ env.FUNCTION_DIR }}/common/configs/function_config_${{ matrix.environment }}.yaml" \
+          CONFIG_FILES=("${{ env.COMMON_DIR }}/configs/function_config_${{ matrix.environment }}.yaml" \
             "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/configs/function_config.yaml" \
             "${{ env.FUNCTION_DIR }}/${{ matrix.function }}/configs/function_config_${{ matrix.environment }}.yaml")
           echo "Config files to use are ${CONFIG_FILES[@]}"
@@ -103,7 +104,7 @@ jobs:
           data_set_id: ${{ steps.extract_params.outputs.data_set_id }}
           schedules_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
           deployment_tenant_id: ${{ steps.extract_params.outputs.tenant_id }}
-          common_folder: ${{ env.FUNCTION_DIR }}/common
+          common_folder: ${{ env.COMMON_DIR }}
           function_deploy_timeout: ${{ steps.extract_params.outputs.function_deploy_timeout }}
           post_deploy_cleanup: ${{ steps.extract_params.outputs.post_deploy_cleanup }}
           description: ${{ steps.extract_params.outputs.description }}
