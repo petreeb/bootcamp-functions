@@ -1,6 +1,6 @@
 try:
     from common import HELLO_WORLD
-except ImportError:
+except:
     import sys
     sys.path.append(f"{sys.path[0]}/..")
     from common import HELLO_WORLD
