@@ -1,7 +1,7 @@
 name: Deploy Functions to CDF project using OIDC
 env:
   FUNCTION_DIR: functions
-  COMMON_DIR: functions/common
+  COMMON_DIR: common
 
 on:
   push:
