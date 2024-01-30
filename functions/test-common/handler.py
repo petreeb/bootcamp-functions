@@ -1,9 +1,9 @@
 try:
-    from utils import HELLO_WORLD
+    from utils import HELLO_WORLD # Cognite Function
 except:
     import sys
     sys.path.append(f"{sys.path[0]}/..")
-    from common.utils import HELLO_WORLD
+    from common.utils import HELLO_WORLD # Local development
 
 def handle(client, data=None) -> None:
     print(f"Successfully imported {HELLO_WORLD}")
