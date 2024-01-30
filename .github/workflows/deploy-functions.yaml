@@ -9,6 +9,7 @@ on:
     paths:
       - .github/workflows/deploy-functions.yaml
       - functions/**
+      - common/**
 
 jobs:
   strategy-builder:
