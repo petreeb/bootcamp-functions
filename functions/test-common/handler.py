@@ -1,9 +1,9 @@
 try:
-    from common import HELLO_WORLD
+    from utils import HELLO_WORLD
 except:
     import sys
     sys.path.append(f"{sys.path[0]}/..")
-    from common import HELLO_WORLD
+    from common.utils import HELLO_WORLD
 
 def handle(client, data=None) -> None:
     print(f"Successfully imported {HELLO_WORLD}")
