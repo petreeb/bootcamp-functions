@@ -1,18 +1,19 @@
-try:
-    from utils import HELLO_WORLD # Cognite Function
-except:
+try: # Cognite Function
+    from common.utils import my_helper1, my_helper2
+except ModuleNotFoundError: # Local development
     import sys
     sys.path.append(f"{sys.path[0]}/..")
-    from common.utils import HELLO_WORLD # Local development
+    from common.utils import my_helper1, my_helper2
 
-def handle(client, data=None) -> None:
-    print(f"Successfully imported {HELLO_WORLD}")
+
+def handle(client=None, data=None) -> None:
+    print(f"Successfully imported {my_helper1}")
+    my_helper2()
 
 if __name__ == '__main__':
     import os
 
     from cognite.client import CogniteClient, ClientConfig
-    from cognite.client.config import global_config
     from cognite.client.credentials import OAuthClientCredentials
     from dotenv import load_dotenv
 
@@ -20,7 +21,7 @@ if __name__ == '__main__':
 
     client = CogniteClient(
         ClientConfig(
-            client_name="Ben SDK",
+            client_name="My Local",
             project=os.environ.get('PROJECT'),
             base_url=os.environ.get('BASE_URL'),
             timeout=600,

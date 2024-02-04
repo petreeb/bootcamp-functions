@@ -1,17 +1,18 @@
 [tool.poetry]
-name = "deploy-functions-oidc-template"
+name = "Bootcamp Functions"
 version = "1.1.0"
-description = "Cognite Functions template for OIDC projects"
-authors = ["hakon.treider@cognite.com"]
+description = "CDF Functions for Bootcamp"
+authors = ["Hakon Treider <hakon.treider@cognite.com>"]
 
 [tool.poetry.dependencies]
 python = "~3.9"
 pytest-custom-exit-code = "^0, >=0.3"
-cognite-extractor-utils = "^3"
+cognite-extractor-utils = "^6.3.2"
 pandas = "*"
 pydantic = "*"
 ujson = "*"
 retry = "*"
+cognite-sdk = "^7.17.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"
