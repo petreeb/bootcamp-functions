@@ -1,7 +1,7 @@
 name: Deploy Functions to CDF project using OIDC
 env:
   FUNCTION_DIR: functions
-  COMMON_DIR: common
+  COMMON_DIR: functions/common
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
     paths:
       - .github/workflows/deploy-functions.yaml
       - functions/**
-      - common/**
+      - functions/common/**
 
 jobs:
   strategy-builder:

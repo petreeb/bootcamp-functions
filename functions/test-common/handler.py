@@ -2,7 +2,7 @@ try: # Cognite Function
     from common.utils import my_helper1, my_helper2
 except ModuleNotFoundError: # Local development
     import sys
-    sys.path.append(f"{sys.path[0]}/../..")
+    sys.path.append(f"{sys.path[0]}/..")
     from common.utils import my_helper1, my_helper2
 
 
