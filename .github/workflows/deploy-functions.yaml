@@ -24,19 +24,14 @@ jobs:
         with:
           fetch-depth: 2
 
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJson(github) }}
-        run: echo "$GITHUB_CONTEXT"
-
       - name: Build Strategy Matrix
         id: create-function-list
         run: |
           MAGIC() { cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'; }
-          CHANGES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- ${{ github.workflow }} ${{ env.COMMON_DIR }}/ | xargs)
+          DEPLOY_ALL=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- ${{ github.workflow }} ${{ env.COMMON_DIR }}/ | xargs)
           {
             echo "FUNCTIONS<<EOF"
-            if test -n $CHANGES; then
+            if test -n $DEPLOY_ALL; then
                 find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.COMMON_DIR }}/ -maxdepth 0 -type d | MAGIC
             else
                 git diff ${{ github.event.before }} ${{ github.event.after }} --name-only ${{ env.FUNCTION_DIR }}/ | MAGIC
@@ -59,7 +54,7 @@ jobs:
     steps:
       - name: Checkout
         id: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 2
 
