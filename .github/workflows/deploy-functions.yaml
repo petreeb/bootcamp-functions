@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
     paths:
-      - ${{ github.workflow }}
+      - .github/workflows/deploy-functions.yaml
       - functions/**
       - functions/common/**
 
