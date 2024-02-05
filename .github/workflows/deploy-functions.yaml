@@ -32,7 +32,7 @@ jobs:
       - name: Build Strategy Matrix
         id: create-function-list
         run: |
-          MAGIC() { cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' }
+          MAGIC() { cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'; }
           CHANGES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/deploy-functions.yaml ${{ env.COMMON_DIR }}/ | xargs)
           {
             echo "FUNCTIONS<<EOF"
@@ -41,7 +41,7 @@ jobs:
             else
                 git diff ${{ github.event.before }} ${{ github.event.after }} --name-only ${{ env.FUNCTION_DIR }}/ | MAGIC
             fi
-            echo EOF
+            echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
   deploy:
