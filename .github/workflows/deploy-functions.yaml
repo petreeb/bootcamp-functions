@@ -1,4 +1,4 @@
-name: Deploy Functions to CDF project using OIDC
+run-name: Deploy Functions from "${{ github.event.head_commit.message }}"
 env:
   FUNCTION_DIR: functions
   COMMON_DIR: functions/common
