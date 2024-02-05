@@ -32,9 +32,9 @@ jobs:
       - name: Build Strategy Matrix
         id: create-function-list
         run: |
+          MAGIC() { cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' }
+          CHANGES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/deploy-functions.yaml ${{ env.COMMON_DIR }}/ | xargs)
           {
-            MAGIC() { cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]' }
-            CHANGES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/deploy-functions.yaml ${{ env.COMMON_DIR }}/ | xargs)
             echo "FUNCTIONS<<EOF"
             if test -n $CHANGES; then
                 find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.COMMON_DIR }}/ -maxdepth 0 -type d | MAGIC
