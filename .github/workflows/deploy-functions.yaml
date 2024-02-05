@@ -7,7 +7,7 @@ on:
   push:
     branches: [main]
     paths:
-      - .github/workflows/deploy-functions.yaml
+      - ${{ github.workflow }}
       - functions/**
       - functions/common/**
 
@@ -33,7 +33,7 @@ jobs:
         id: create-function-list
         run: |
           MAGIC() { cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'; }
-          CHANGES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/deploy-functions.yaml ${{ env.COMMON_DIR }}/ | xargs)
+          CHANGES=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- ${{ github.workflow }} ${{ env.COMMON_DIR }}/ | xargs)
           {
             echo "FUNCTIONS<<EOF"
             if test -n $CHANGES; then
