@@ -24,14 +24,22 @@ jobs:
         with:
           fetch-depth: 2
 
+      - name: What's my name again
+        id: mynameagain
+        run: echo ${{ github.action_path }}
+
       - name: Build Strategy Matrix
         id: create-function-list
         run: |
           {
+            MAGIC=cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
+            CHANGES=git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/deploy-functions.yaml ${{ env.COMMON_DIR }}/ | xargs
             echo "FUNCTIONS<<EOF"
-            test -n "$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} -- .github/workflows/deploy-functions.yaml ${{ env.COMMON_DIR }}/ | xargs)"\
-            && find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.COMMON_DIR }}/ -maxdepth 0 -type d | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'\
-            || git diff ${{ github.event.before }} ${{ github.event.after }} --name-only ${{ env.FUNCTION_DIR }}/ | cut -d / -f 2 | jq -sR '[split("\n")[]|select(.|length>0)]'
+            if test -n $CHANGES; then
+                find ${{ env.FUNCTION_DIR }}/*/ -not -path ${{ env.COMMON_DIR }}/ -maxdepth 0 -type d | $MAGIC
+            else
+                git diff ${{ github.event.before }} ${{ github.event.after }} --name-only ${{ env.FUNCTION_DIR }}/ | $MAGIC
+            fi
             echo EOF
           } >> "$GITHUB_OUTPUT"
 
