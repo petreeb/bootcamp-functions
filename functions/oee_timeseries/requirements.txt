@@ -2,4 +2,3 @@ arrow
 pandas
 pydantic
 retry
-cognite-sdk==6.39.6
